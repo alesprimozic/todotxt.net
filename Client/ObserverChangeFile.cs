@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Windows;
-using System.Windows.Forms;
-using ToDoLib;
 using System.IO;
-
-using System.Windows.Input;
 
 namespace Client
 {
-    class ObserverChangeFile
+    class ObserverChangeFile: IDisposable
     {
         private string _filename = "";
         private FileSystemWatcher _watcher;
+        private bool _disposed;
 
         public ObserverChangeFile()
         {
@@ -59,9 +55,32 @@ namespace Client
 
         public event FileTaskListChange OnFileTaskListChange;
 
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (this._watcher != null)
+                    {
+                        this._watcher.Dispose();
+                        this._watcher = null;
+                    }
+                }
+
+                _disposed = true;
+            }
+        }
+
         private void FileChange(object source, FileSystemEventArgs e)
         {
             OnFileTaskListChange();
-        }
+        }        
     }
 }

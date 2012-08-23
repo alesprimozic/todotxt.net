@@ -1,18 +1,15 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
-using System.Xml;
-using Microsoft.Win32;
 using ToDoLib;
 
 namespace Client
@@ -20,7 +17,7 @@ namespace Client
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : Window
+	public partial class MainWindow : Window, IDisposable
 	{
 		class WindowLocation
 		{
@@ -38,17 +35,18 @@ namespace Client
 			public double Width { get; set; }
 		}
 
-		TaskList _taskList;
-		SortType _currentSort;
-		Task _updating;
-		int _intelliPos;
-		TrayMainWindows _tray;
-		HotKeyMainWindows _hotkey;
-		ObserverChangeFile _changefile;
-		CheckUpdate _checkupdate;
+		private TaskList _taskList;
+        private SortType _currentSort;
+        private Task _updating;
+        private int _intelliPos;
+        private TrayMainWindows _tray;
+        private HotKeyMainWindows _hotkey;
+        private ObserverChangeFile _changefile;
+        private CheckUpdate _checkupdate;
 
-		WindowLocation _previousWindowLocaiton;
+        private WindowLocation _previousWindowLocaiton;
 		private Help _helpPage;
+        private bool _disposed;
 
 		public MainWindow()
 		{
@@ -58,11 +56,11 @@ namespace Client
 
 				if (User.Default.MinimiseToSystemTray)
 				{
-					//add tray icon
-					_tray = new TrayMainWindows(this);
+				    //add tray icon
+				    _tray = new TrayMainWindows(this);
 
-					//add global key
-					_hotkey = new HotKeyMainWindows(this, ModifierKeys.Windows | ModifierKeys.Alt, System.Windows.Forms.Keys.T);
+				    //add global key
+				    _hotkey = new HotKeyMainWindows(this, ModifierKeys.Windows | ModifierKeys.Alt, System.Windows.Forms.Keys.T);
 				}
 
 				//add view on change file
@@ -103,6 +101,12 @@ namespace Client
 				HandleException("An error occurred while intialising the application", ex);
 			}
 		}
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
 		protected override void OnClosed(EventArgs e)
 		{
@@ -494,7 +498,6 @@ namespace Client
 			}
 		}
 
-
 		private void File_Open(object sender, RoutedEventArgs e)
 		{
 			var dialog = new OpenFileDialog();
@@ -602,7 +605,6 @@ namespace Client
 			if (lbTasks.Items == null || lbTasks.Items.IsEmpty)
 				return "";
 
-
 			var contents = new StringBuilder();
 
 			contents.Append("<html><head>");
@@ -654,7 +656,6 @@ namespace Client
 
 			return contents.ToString();
 		}
-
 
 		private void File_PrintPreview(object sender, RoutedEventArgs e)
 		{
@@ -980,11 +981,36 @@ namespace Client
 		}
 		#endregion
 
+		#endregion       
+        
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (_tray != null)
+                    {
+                        _tray.Dispose();
+                        _tray = null;
+                    }
 
-		#endregion
+                    if (_hotkey != null)
+                    {
+                        _hotkey.Dispose();
+                        _hotkey = null;
+                    }
 
+                    if (_changefile != null)
+                    {
+                        _changefile.Dispose();
+                        _changefile = null;
+                    }
+                }
 
-       
-	}
+                _disposed = true;
+            }
+        }
+    }
 }
 
