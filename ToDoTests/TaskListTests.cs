@@ -314,8 +314,7 @@ namespace ToDoTests
 							s.WriteLine("hello");
 							s.Flush();
 						}
-						Thread.Sleep(500);
-						f.Close();
+						Thread.Sleep(500);						
 					}
 					catch (Exception ex)
 					{
@@ -338,7 +337,6 @@ namespace ToDoTests
 			{
 				thread.Join();
 			}
-
 		}
 
         private List<Task> getTestList()
