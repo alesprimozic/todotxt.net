@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -109,7 +110,7 @@ namespace ToDoLib
 					do
 					{
 						due = due.AddDays(1);
-					} while (!string.Equals(due.ToString("dddd"), dueDateRelative, StringComparison.CurrentCultureIgnoreCase));
+                    } while (!string.Equals(due.ToString("dddd", DateTimeFormatInfo.InvariantInfo), dueDateRelative, StringComparison.CurrentCultureIgnoreCase));
 				}
 				raw = reg.Replace(raw, "due:" + due.ToString("yyyy-MM-dd"));
 			}

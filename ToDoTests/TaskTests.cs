@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using ToDoLib;
+using System.Globalization;
 
 namespace ToDoTests
 {
@@ -151,9 +152,11 @@ namespace ToDoTests
             var task = new Task("(A) due:thUrsday @work @home +test This is a test task");
 
             var dueDate=DateTime.Now;
-            do{
+            do
+            {
                 dueDate=dueDate.AddDays(1);
-            } while (!string.Equals(dueDate.ToString("dddd"), "thursday", StringComparison.CurrentCultureIgnoreCase));
+            } while (!string.Equals(dueDate.ToString("dddd", DateTimeFormatInfo.InvariantInfo), "thursday", StringComparison.CurrentCultureIgnoreCase));
+            
             string due = dueDate.ToString("yyyy-MM-dd");
 
             var expectedTask = new Task("(A)", _projects, new List<string>() { "@work", "@home" }, "This is a test task", due, false);
